@@ -127,7 +127,7 @@ function docker-exec
     # 2. 後ろにコマンドがある場合は bash 固定で実行して終了
     if test (count $argv) -gt 0
         set -l cmd_str (string join " " $argv)
-        docker exec -it $container bash -c "$cmd_str"
+        docker exec -it $container sh -c "$cmd_str"
         return
     end
 

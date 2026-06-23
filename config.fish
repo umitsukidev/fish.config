@@ -44,13 +44,6 @@ abbr -a lg lazygit
 # @fish-lsp-disable-next-line 1004
 source {$HOME}/.config/fish/user/prompt.fish
 
-# pnpm
-set -gx PNPM_HOME {$HOME}/Library/pnpm
-if not string match -q -- $PNPM_HOME $PATH
-    set -gx PATH "$PNPM_HOME" $PATH
-end
-# pnpm end
-
 # activate mise
 if status is-interactive
     mise activate fish | source
@@ -161,8 +154,24 @@ function docker-exec
     docker exec -it $container $chosen_shell
 end
 abbr -a de docker-exec
+abbr -a dcu docker compose up -d
 
 # @fish-lsp-disable-next-line 1004
 source {$HOME}/.config/op/plugins.sh
 
 abbr -a c --command docker compose
+
+# pnpm
+set -gx PNPM_HOME "$HOME/Library/pnpm"
+if not string match -q -- "$PNPM_HOME/bin" $PATH
+    set -gx PATH "$PNPM_HOME/bin" $PATH
+end
+# pnpm end
+
+# Added by Antigravity CLI installer
+set -gx PATH "$HOME/.local/bin" $PATH
+
+# Added by Antigravity IDE
+fish_add_path "$HOME/.antigravity-ide/antigravity-ide/bin"
+
+abbr -a agyide antigravity-ide

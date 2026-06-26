@@ -40,10 +40,6 @@ abbr -a nv nvim
 # lazygit alias
 abbr -a lg lazygit
 
-# setup prompt
-# @fish-lsp-disable-next-line 1004
-source {$HOME}/.config/fish/user/prompt.fish
-
 # activate mise
 if status is-interactive
     mise activate fish | source
@@ -175,3 +171,7 @@ set -gx PATH "$HOME/.local/bin" $PATH
 fish_add_path "$HOME/.antigravity-ide/antigravity-ide/bin"
 
 abbr -a agyide antigravity-ide
+
+# setup prompt
+# @fish-lsp-disable-next-line 1004
+source {$HOME}/.config/fish/user/prompt.fish

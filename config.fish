@@ -1,19 +1,17 @@
 set uname_m (uname -m)
 
-set -x ENV $uname_m $ARCH
-
 set -x ARCH $uname_m
+
 set -x EDITOR nvim
 
 # Homebrew
 if status is-interactive
     # Commands to run in interactive sessions can go here
-
     # PATH
     if test $uname_m = arm64
-        set PATH /opt/homebrew/bin $PATH
+        fish_add_path /opt/homebrew/bin
     else if test $uname_m = x86_64
-        set PATH /usr/local/bin $PATH
+        fish_add_path /usr/local/bin
     end
 end
 
@@ -153,19 +151,17 @@ abbr -a de docker-exec
 abbr -a dcu docker compose up -d
 
 # @fish-lsp-disable-next-line 1004
-source {$HOME}/.config/op/plugins.sh
+source "$HOME/.config/op/plugins.sh"
 
 abbr -a c --command docker compose
 
 # pnpm
 set -gx PNPM_HOME "$HOME/Library/pnpm"
-if not string match -q -- "$PNPM_HOME/bin" $PATH
-    set -gx PATH "$PNPM_HOME/bin" $PATH
-end
+fish_add_path "$PNPM_HOME/bin"
 # pnpm end
 
 # Added by Antigravity CLI installer
-set -gx PATH "$HOME/.local/bin" $PATH
+fish_add_path "$HOME/.local/bin"
 
 # Added by Antigravity IDE
 fish_add_path "$HOME/.antigravity-ide/antigravity-ide/bin"
@@ -173,5 +169,4 @@ fish_add_path "$HOME/.antigravity-ide/antigravity-ide/bin"
 abbr -a agyide antigravity-ide
 
 # setup prompt
-# @fish-lsp-disable-next-line 1004
-source {$HOME}/.config/fish/user/prompt.fish
+source "$HOME/.config/fish/user/prompt.fish"

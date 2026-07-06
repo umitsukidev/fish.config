@@ -54,18 +54,21 @@ test -e {$HOME}/.iterm2_shell_integration.fish; and source {$HOME}/.iterm2_shell
 # Mole shell completion
 set -l output (mole completion fish 2>/dev/null); and echo "$output" | source
 
-# Set up fzf key bindings
-fzf --fish | source
-set -gx FZF_DEFAULT_OPTS "--height 40% --layout=reverse --border"
-set -gx FZF_CTRL_T_OPTS "--preview 'test -d {} && eza -T -L 2 --color=always --icons {} || bat --color=always --line-range :300 {}'"
-# Setup zoxide
-zoxide init fish --cmd cd | source
+if status is-interactive
+    # Set up fzf key bindings
+    fzf --fish | source
+    set -gx FZF_DEFAULT_OPTS "--height 40% --layout=reverse --border"
+    set -gx FZF_CTRL_T_OPTS "--preview 'test -d {} && eza -T -L 2 --color=always --icons {} || bat --color=always --line-range :300 {}'"
 
-# Setup eza
-if type -q eza
-    alias ls 'eza --icons --git'
-    alias ll 'eza -al --icons --git'
-    alias lt 'eza -T --icons --git' # ツリー表示
+    # Setup zoxide
+    zoxide init fish --cmd cd | source
+
+    # Setup eza
+    if type -q eza
+        alias ls 'eza --icons --git'
+        alias ll 'eza -al --icons --git'
+        alias lt 'eza -T --icons --git' # ツリー表示
+    end
 end
 
 # bat alias
@@ -152,7 +155,6 @@ end
 abbr -a de docker-exec
 abbr -a dcu docker compose up -d
 
-# @fish-lsp-disable-next-line 1004
 source "$HOME/.config/op/plugins.sh"
 
 abbr -a c --command docker compose
@@ -169,6 +171,11 @@ fish_add_path -g "$HOME/.local/bin"
 fish_add_path -g "$HOME/.antigravity-ide/antigravity-ide/bin"
 
 abbr -a agyide antigravity-ide
+
+# cloudflare tunnel
+function tunnel
+    caddy reverse-proxy --from :18787 --to :$argv
+end
 
 # setup prompt
 source "$HOME/.config/fish/user/prompt.fish"

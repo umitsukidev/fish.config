@@ -64,10 +64,7 @@ if status is-interactive
 end
 
 # setup atuin
-atuin init fish | source
-
-# bat alias
-abbr -a less bat
+atuin init fish --disable-up-arrow | source
 
 # use chrome from cli
 alias chrome="/Applications/Google\ Chrome.app/Contents/MacOS/Google\ Chrome"

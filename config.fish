@@ -40,25 +40,17 @@ abbr -a nv nvim
 # lazygit alias
 abbr -a lg lazygit
 
-# activate mise
-if status is-interactive
-    mise activate fish | source
-else
-    mise activate fish --shims | source
-end
+abbr -a mc mcat
 
 # iTerm2 integration
 # @fish-lsp-disable-next-line 1004
 test -e {$HOME}/.iterm2_shell_integration.fish; and source {$HOME}/.iterm2_shell_integration.fish
 
-# Mole shell completion
-set -l output (mole completion fish 2>/dev/null); and echo "$output" | source
-
 if status is-interactive
     # Set up fzf key bindings
     fzf --fish | source
     set -gx FZF_DEFAULT_OPTS "--height 40% --layout=reverse --border"
-    set -gx FZF_CTRL_T_OPTS "--preview 'test -d {} && eza -T -L 2 --color=always --icons {} || bat --color=always --line-range :300 {}'"
+    set -gx FZF_CTRL_T_OPTS "--preview 'test -d {} && eza -T -L 2 --color=always --icons always {} || bat --color=always --line-range :300 {}'"
 
     # Setup zoxide
     zoxide init fish --cmd cd | source
@@ -71,6 +63,9 @@ if status is-interactive
     end
 end
 
+# setup atuin
+atuin init fish | source
+
 # bat alias
 abbr -a less bat
 
@@ -79,6 +74,9 @@ alias chrome="/Applications/Google\ Chrome.app/Contents/MacOS/Google\ Chrome"
 
 # use processing from cli
 alias processing="/Applications/Processing.app/Contents/MacOS/Processing"
+
+# use yoink from cli
+alias yoink="open -a Yoink"
 
 # venvのabbr
 abbr -a activate . .venv/bin/activate.fish
@@ -161,7 +159,9 @@ abbr -a c --command docker compose
 
 # pnpm
 set -gx PNPM_HOME "$HOME/Library/pnpm"
-fish_add_path -g "$PNPM_HOME/bin"
+if not string match -q -- "$PNPM_HOME/bin" $PATH
+    set -gx PATH "$PNPM_HOME/bin" $PATH
+end
 # pnpm end
 
 # Added by Antigravity CLI installer
@@ -176,6 +176,15 @@ abbr -a agyide antigravity-ide
 function tunnel
     caddy reverse-proxy --from :18787 --to :$argv
 end
+
+# activate mise
+if status is-interactive
+    mise activate fish | source
+else
+    mise activate fish --shims | source
+end
+
+fish_add_path -g "$HOME/.bun/bin"
 
 # setup prompt
 source "$HOME/.config/fish/user/prompt.fish"

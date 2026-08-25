@@ -178,6 +178,15 @@ function tunnel
     caddy reverse-proxy --from :18787 --to :$argv
 end
 
+# select a zellij session with fzf and attach to it
+function zellija
+    set -l session (zellij list-sessions --short | fzf --height 40% --layout=reverse --border --prompt='zellij attach> ')
+    if test -n "$session"
+        zellij attach "$session"
+    end
+end
+abbr -a zela zellija
+
 # activate mise
 if status is-interactive
     mise activate fish | source

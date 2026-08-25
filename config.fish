@@ -198,6 +198,34 @@ function zellija
 end
 abbr -a zela zellija
 
+# interactively run a pnpm script from package.json
+function pnr
+    if not test -f package.json
+        echo "package.json not found in $PWD"
+        return 1
+    end
+
+    if not type -q jq
+        echo "pnr requires jq"
+        return 1
+    end
+
+    set -l scripts (jq -r '.scripts // {} | to_entries[] | [.key, .value] | @tsv' package.json 2>/dev/null | awk -F '\t' '{ printf "%-24s\t%s\n", $1, $2 }')
+    if test $status -ne 0
+        echo "Failed to read scripts from package.json"
+        return 1
+    end
+    if test (count $scripts) -eq 0
+        echo "No npm scripts found in package.json"
+        return 1
+    end
+
+    set -l script (printf '%s\n' $scripts | fzf --height 40% --layout=reverse --border --delimiter='\t' --with-nth=1 --accept-nth=1 --prompt='pnpm run> ' --preview='printf "%s\\n" {2..} | bat --language=sh --style=plain --color=always --theme=auto:system --paging=never' --preview-window=right:60%,wrap)
+    if test -n "$script"
+        pnpm run "$script"
+    end
+end
+
 # activate mise
 if status is-interactive
     mise activate fish | source

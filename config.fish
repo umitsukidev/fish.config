@@ -180,9 +180,20 @@ end
 
 # select a zellij session with fzf and attach to it
 function zellija
-    set -l session (zellij list-sessions --short | fzf --height 40% --layout=reverse --border --prompt='zellij attach> ')
-    if test -n "$session"
-        zellij attach "$session"
+    set -l sessions (zellij list-sessions --short)
+    set -l current_session $ZELLIJ_SESSION_NAME
+
+    if test -n "$current_session"
+        set sessions (for session in $sessions
+            if test "$session" != "$current_session"
+                printf '%s\n' "$session"
+            end
+        end)
+    end
+
+    set -l selected_session (printf '%s\n' $sessions | fzf --height 40% --layout=reverse --border --prompt='zellij attach> ')
+    if test -n "$selected_session"
+        zellij attach "$selected_session"
     end
 end
 abbr -a zela zellija

@@ -72,6 +72,10 @@ alias chrome="/Applications/Google\ Chrome.app/Contents/MacOS/Google\ Chrome"
 # use processing from cli
 alias processing="/Applications/Processing.app/Contents/MacOS/Processing"
 
+# launch screensaver from cli
+alias screensaver="open -a ScreenSaverEngine"
+abbr -a ss screensaver
+
 # use yoink from cli
 alias yoink="open -a Yoink"
 

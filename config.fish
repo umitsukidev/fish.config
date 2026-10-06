@@ -154,6 +154,126 @@ end
 abbr -a de docker-exec
 abbr -a dcu docker compose up -d
 
+function cwt --description 'Select a Git worktree with fzf and cd into it'
+    command git rev-parse --git-dir >/dev/null 2>&1
+    or begin
+        echo 'cwt: not inside a Git repository' >&2
+        return 1
+    end
+
+    set -f wt_paths
+    set -f wt_labels
+
+    set -f path ''
+    set -f branch ''
+    set -f detached 0
+    set -f bare 0
+    set -f locked 0
+    set -f prunable 0
+
+    command git worktree list --porcelain -z |
+        while read -z key value
+            # porcelain の空レコード = 1 worktree の終端
+            if test -z "$key"
+                if test -n "$path"
+                    if test "$bare" = 1
+                        set label '(bare)'
+                    else if test "$detached" = 1
+                        set label '(detached)'
+                    else if test -n "$branch"
+                        set label (
+                            string replace 'refs/heads/' '' -- "$branch"
+                        )
+                    else
+                        set label '(unknown)'
+                    end
+
+                    if test "$locked" = 1
+                        set label "$label [locked]"
+                    end
+
+                    if test "$prunable" = 1
+                        set label "$label [prunable]"
+                    end
+
+                    set -a wt_paths "$path"
+                    set -a wt_labels "$label"
+                end
+
+                set path ''
+                set branch ''
+                set detached 0
+                set bare 0
+                set locked 0
+                set prunable 0
+                continue
+            end
+
+            switch "$key"
+                case worktree
+                    set path "$value"
+                case branch
+                    set branch "$value"
+                case detached
+                    set detached 1
+                case bare
+                    set bare 1
+                case locked
+                    set locked 1
+                case prunable
+                    set prunable 1
+            end
+        end
+
+    test (count $wt_paths) -gt 0
+    or return 1
+
+    set -l selected (
+        begin
+            set -l i 1
+
+            while test $i -le (count $wt_paths)
+                # fzf に見せる文字列だけエスケープする。
+                # 実際の path は wt_paths にそのまま保持。
+                set -l display_path (
+                    string escape --no-quoted --style=script -- "$wt_paths[$i]"
+                )
+
+                printf '%d\t%s\t%s\0' \
+                    $i \
+                    "$wt_labels[$i]" \
+                    "$display_path"
+
+                set i (math $i + 1)
+            end
+        end |
+            fzf \
+                --read0 \
+                --print0 \
+                --delimiter='\t' \
+                --with-nth=2.. \
+                --accept-nth=1 \
+                --prompt='worktree> ' |
+            string split0
+    )
+
+    test -n "$selected"
+    or return 0
+
+    cd -- "$wt_paths[$selected]"
+end
+
+# go to git root
+function ggr
+    set -l root (git rev-parse --show-toplevel 2>/dev/null)
+    or begin
+        echo "Not inside a Git repository" >&2
+        return 1
+    end
+
+    cd "$root"
+end
+
 source "$HOME/.config/op/plugins.sh"
 
 abbr -a c --command docker compose
